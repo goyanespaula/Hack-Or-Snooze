@@ -103,7 +103,7 @@ $(function () {
 
   $navSubmit.on('click', e => {
     if (!token) {
-      mustLogin();
+      mustLogin($loginForm, $createAccountForm, $submitForm, $allArticlesList, $filteredArticles, $favoritedArticles);
     } else {
       $favoritedArticles.hide();
       $allArticlesList.show();

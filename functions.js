@@ -139,14 +139,21 @@ function addStory(title, url, author) {
       }
     }
   });
+}
 
-  function mustLogin() {
-    $loginForm.slideDown();
-    $createAccountForm.slideDown();
-    $submitForm.hide();
-    $allArticlesList.hide();
-    $filteredArticles.hide();
-    $favoritedArticles.hide();
-    alert("You must login before performing this action");
-  }
+function mustLogin(
+  $loginForm,
+  $createAccountForm,
+  $submitForm,
+  $allArticlesList,
+  $filteredArticles,
+  $favoritedArticles
+) {
+  $loginForm.slideDown();
+  $createAccountForm.slideDown();
+  $submitForm.hide();
+  $allArticlesList.hide();
+  $filteredArticles.hide();
+  $favoritedArticles.hide();
+  alert("You must login before performing this action");
 }
