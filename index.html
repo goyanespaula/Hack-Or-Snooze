@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>P&amp;R: Hack or Snooze</title>
+  <script defer src="https://use.fontawesome.com/releases/v5.0.6/js/all.js"></script>
+  <link href="https://fonts.googleapis.com/css?family=Arimo:400,700" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.0/normalize.css">
+  <link rel="stylesheet" href="style.css" type="text/css">
+</head>
+<body>
+  <nav>
+    <h1>Hack or Snooze</h1>
+    <section class="nav-links">
+      <a href="#" id="nav-submit">submit</a>
+      <span>|</span>
+      <a href="#" id="nav-favorites">favorites</a>
+      <a href="#" id="nav-all" class="hidden">all</a>
+    </section>
+  </nav>
+  <section class="articles-container">
+    <form action="" class="hidden">
+      <div class="submit-articles-input">
+        <label for="title">title</label>
+        <input id="title" type="text" placeholder="article title">
+      </div>
+      <div class="submit-articles-input">
+        <label for="url">url</label>
+        <input id="url" type="text" placeholder="article url">
+      </div>
+      <button type="submit">submit</button>
+      <hr>
+    </form>
+    <article>
+      <ol id="all-articles-list" class="articles-list">
+        <li id="1" class="id-1">
+          <span class="star">
+            <i class="far fa-star"></i>
+          </span>
+          <a class="article-link" href="https://visualgo.net/en" target="a_blank">
+             <strong>Visualizing Algorithms</strong>
+          </a>
+          <small class="article-hostname">(visualgo.net)</small>
+        </li>
+        <li id="2" class="id-2">
+          <span class="star">
+            <i class="far fa-star"></i>
+          </span>
+          <a class="article-link" href="https://www.rithmschool.com/courses" target="a_blank">
+            <strong>Take Classes w/ Rithm</strong>
+          </a>
+          <small class="article-hostname">(rithmschool.com)</small>
+        </li>
+        <li id="3" class="id-3">
+          <span class="star">
+            <i class="far fa-star"></i>
+          </span>
+          <a class="article-link" href="http://www.nytimes.com/books/97/06/15/reviews/marque-solitude.html" target="a_blank">
+            <strong>Analysis: 100 Years of Solitude</strong>
+          </a>
+          <small class="article-hostname">(nytimes.com)</small>
+        </li>
+      </ol>
+    </article>
+    <article>
+      <ul id="favorited-articles" class="hidden articles-list">
+      </ul>
+    </article>
+    <article>
+      <ul id="filtered-articles" class="hidden articles-list">
+      </ul>
+    </article>
+  </section>
+</body>
+<script src="https://code.jquery.com/jquery-3.3.1.js" integrity="sha256-2Kok7MbOyxpgUVvAk/HJ2jigOSYS2auK4Pfzbm7uH60=" crossorigin="anonymous"></script>
+<script src="script.js"></script>
+</html>
