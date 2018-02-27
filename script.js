@@ -1,6 +1,6 @@
 var id = 3;
 
-$(function() {
+$(function () {
   var $loginForm = $('#login-form');
   var $createAccountForm = $('#create-account-form');
   var $articlesContainer = $('.articles-container');
@@ -15,36 +15,79 @@ $(function() {
   var $navAll = $('#nav-all');
   var $favoritedArticles = $('#favorited-articles');
   var $filteredArticles = $('#filtered-articles');
+  var userObject;
 
   firstTenStories($allArticlesList);
 
-  $createAccountForm.on('submit', e=> {
+  // CREATING LOGIN EVENT
+
+  $loginForm.on('submit', e => {
+    e.preventDefault();
+    var username = $('#login-username').val();
+    var password = $('#login-password').val();
+    getToken(username, password).then(function () {
+      return loginUser(username)
+    }).then(function (user) {
+      userObject = user;
+      $navWelcome.html(`Hi, ${userObject.data.username}`);
+      $navLogin.hide();
+      $loginForm.hide();
+      $createAccountForm.hide();
+      $navWelcome.show();
+      $navLogOut.show();
+      $allArticlesList.show();
+    }).catch(function (error) {
+      alert("USERNAME OR PASSWORD INVALID")
+    })
+
+    $loginForm.trigger("reset");
+
+  });
+
+  // END LOGIN EVENT
+
+
+  $createAccountForm.on('submit', e => {
     e.preventDefault();
     var name = $('#create-account-name').val();
     var username = $('#create-account-username').val();
     var password = $('#create-account-password').val();
-    createUser(name, username, password).then(function() {
-      getToken(username, password);
-    });
+    createUser(name, username, password).then(function () {
+      getToken(username, password).then(function () {
+        return loginUser(username)
+      }).then(function (user) {
+        userObject = user;
+        $navWelcome.html(`Hi, ${userObject.data.username}`);
+        $navLogin.hide();
+        $loginForm.hide();
+        $createAccountForm.hide();
+        $navWelcome.show();
+        $navLogOut.show();
+        $allArticlesList.show();
+      })
+    }).catch(function (error) {
+      alert("Woops, this user already exists.  Login instead.");
+    })
     $createAccountForm.trigger("reset");
+  })
 
-    $navLogin.hide();
-    $loginForm.hide();
-    $createAccountForm.hide();
-    $navWelcome.html(`Hi, ${name}`);
-    $navWelcome.show();
-    $navLogOut.show();
-    $allArticlesList.show();
-  });
+  // CREATE LOGOUT EVENT
 
-  $navLogin.on('click', e=> {
+  $navLogOut.on('click', function (e) {
+    localStorage.clear();
+    location.reload();
+  })
+
+  // END LOGOUT EVENT
+
+  $navLogin.on('click', e => {
     $loginForm.slideDown();
     $createAccountForm.slideDown();
     $submitForm.hide();
     $allArticlesList.hide();
     $filteredArticles.hide();
     $favoritedArticles.hide();
-  });  
+  });
 
   $navSubmit.on('click', e => {
     $favoritedArticles.hide();
@@ -129,7 +172,7 @@ function getHostName(url) {
   } else {
     hostName = url.split("/")[0];
   }
-  if (hostName.slice(0,4) === 'www.') {
+  if (hostName.slice(0, 4) === 'www.') {
     hostName = hostName.slice(4);
   }
   return hostName;
@@ -140,8 +183,8 @@ function getStories() {
 }
 
 function firstTenStories($allArticlesList) {
-  getStories().then(function(stories) {
-    stories.data.forEach(function(story) {
+  getStories().then(function (stories) {
+    stories.data.forEach(function (story) {
       id++;
       let url = story.url;
       let hostName = getHostName(url);
@@ -216,6 +259,16 @@ function createUser(name, username, password) {
   });
 }
 
+function loginUser(username) {
+  return $.ajax({
+    method: "GET",
+    url: `https://hack-or-snooze.herokuapp.com/users/${username}`,
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem("token")}`
+    }
+  });
+}
+
 function getToken(username, password) {
   return $.ajax({
     method: "POST",
@@ -226,18 +279,7 @@ function getToken(username, password) {
         password: password
       }
     }
-  }).then(function(val) {
+  }).then(function (val) {
     localStorage.setItem("token", val.data.token);
-  });
-}
-
-function checkUser() {
-  $.ajax({
-    method: "GET",
-    url: "https://hack-or-snooze.herokuapp.com/users/bobbyface3",
-    headers: {
-      Authorization: `Bearer ${localStorage.getItem("token")}`
-    }
-  }).then(function(val) {
   });
 }
