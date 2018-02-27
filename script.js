@@ -1,4 +1,13 @@
 var id = 3;
+var token = localStorage.getItem("token");
+if (token) {
+  var payload = token.split(".")[1] || undefined;
+  var parsedPayload = JSON.parse(atob(payload));
+  var username = parsedPayload.username;
+  var userObject = getUser(username).then(function(user) {
+    return user;
+  });
+}
 
 $(function () {
   var $loginForm = $('#login-form');
@@ -15,18 +24,23 @@ $(function () {
   var $navAll = $('#nav-all');
   var $favoritedArticles = $('#favorited-articles');
   var $filteredArticles = $('#filtered-articles');
-  var userObject;
+
+  if (username) {
+    $navLogin.hide();
+    $navWelcome.html('Hi, ' + username);
+    $navWelcome.show();
+    $navLogOut.show();
+  }
 
   firstTenStories($allArticlesList);
 
   // CREATING LOGIN EVENT
-
   $loginForm.on('submit', e => {
     e.preventDefault();
     var username = $('#login-username').val();
     var password = $('#login-password').val();
     getToken(username, password).then(function () {
-      return loginUser(username)
+      return getUser(username);
     }).then(function (user) {
       userObject = user;
       $navWelcome.html(`Hi, ${userObject.data.username}`);
@@ -37,16 +51,14 @@ $(function () {
       $navLogOut.show();
       $allArticlesList.show();
     }).catch(function (error) {
-      alert("USERNAME OR PASSWORD INVALID")
-    })
+      alert("USERNAME OR PASSWORD INVALID");
+    });
 
     $loginForm.trigger("reset");
-
   });
-
   // END LOGIN EVENT
 
-
+  // CREATING USER EVENT
   $createAccountForm.on('submit', e => {
     e.preventDefault();
     var name = $('#create-account-name').val();
@@ -54,7 +66,7 @@ $(function () {
     var password = $('#create-account-password').val();
     createUser(name, username, password).then(function () {
       getToken(username, password).then(function () {
-        return loginUser(username)
+        return getUser(username)
       }).then(function (user) {
         userObject = user;
         $navWelcome.html(`Hi, ${userObject.data.username}`);
@@ -67,18 +79,11 @@ $(function () {
       })
     }).catch(function (error) {
       alert("Woops, this user already exists.  Login instead.");
-    })
+    });
+
     $createAccountForm.trigger("reset");
-  })
-
-  // CREATE LOGOUT EVENT
-
-  $navLogOut.on('click', function (e) {
-    localStorage.clear();
-    location.reload();
-  })
-
-  // END LOGOUT EVENT
+  });
+  // END CREATING USER EVENT
 
   $navLogin.on('click', e => {
     $loginForm.slideDown();
@@ -89,17 +94,34 @@ $(function () {
     $favoritedArticles.hide();
   });
 
+  // CREATE LOGOUT EVENT
+  $navLogOut.on('click', function (e) {
+    localStorage.clear();
+    location.reload();
+  });
+  // END LOGOUT EVENT
+
   $navSubmit.on('click', e => {
-    $favoritedArticles.hide();
-    $allArticlesList.show();
-    $filteredArticles.hide();
-    $loginForm.hide();
-    $createAccountForm.hide();
-    if ($navAll.is(':visible')) {
-      $navAll.hide();
-      $navFavorites.show();
+    if (!token) {
+      $loginForm.slideDown();
+      $createAccountForm.slideDown();
+      $submitForm.hide();
+      $allArticlesList.hide();
+      $filteredArticles.hide();
+      $favoritedArticles.hide();
+      alert("You must login to submit");  
+    } else {
+      $favoritedArticles.hide();
+      $allArticlesList.show();
+      $filteredArticles.hide();
+      $loginForm.hide();
+      $createAccountForm.hide();
+      if ($navAll.is(":visible")) {
+        $navAll.hide();
+        $navFavorites.show();
+      }
+      $submitForm.slideToggle();
     }
-    $submitForm.slideToggle();
   });
 
   $nav.on('click', '#nav-favorites, #nav-all', e => {
@@ -138,6 +160,12 @@ $(function () {
       <small class="article-hostname ${hostName}">(${hostName})</small>
       <small class="article-author">by ${author}</small>
       </li>`);
+    addStory(title, url, author).then(function() {
+      getUser(username).then(function(user) {
+        userObject = user;
+        console.log(userObject);
+      })
+    });
     $allArticlesList.append($li);
     $submitForm.slideUp('slow');
     $submitForm.trigger('reset');
@@ -259,7 +287,7 @@ function createUser(name, username, password) {
   });
 }
 
-function loginUser(username) {
+function getUser(username) {
   return $.ajax({
     method: "GET",
     url: `https://hack-or-snooze.herokuapp.com/users/${username}`,
@@ -281,5 +309,23 @@ function getToken(username, password) {
     }
   }).then(function (val) {
     localStorage.setItem("token", val.data.token);
+    token = localStorage.getItem("token");
+  });
+}
+
+function addStory(title, url, author) {
+  return $.ajax({
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem("token")}`
+    },
+    data: {
+      data: {
+        username,
+        title,
+        author,
+        url
+      }
+    }
   });
 }
