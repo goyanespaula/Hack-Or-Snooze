@@ -1,13 +1,15 @@
 var id = 3;
 
 $(function() {
-  var $navLogin = $('#nav-login');
   var $loginForm = $('#login-form');
   var $createAccountForm = $('#create-account-form');
   var $articlesContainer = $('.articles-container');
   var $submitForm = $('#submit-form');
   var $allArticlesList = $('#all-articles-list');
   var $nav = $('nav');
+  var $navLogin = $("#nav-login");
+  var $navWelcome = $("#nav-welcome");
+  var $navLogOut = $('#nav-logout');
   var $navSubmit = $('#nav-submit');
   var $navFavorites = $('#nav-favorites');
   var $navAll = $('#nav-all');
@@ -25,6 +27,14 @@ $(function() {
       getToken(username, password);
     });
     $createAccountForm.trigger("reset");
+
+    $navLogin.hide();
+    $loginForm.hide();
+    $createAccountForm.hide();
+    $navWelcome.html(`Hi, ${name}`);
+    $navWelcome.show();
+    $navLogOut.show();
+    $allArticlesList.show();
   });
 
   $navLogin.on('click', e=> {
@@ -83,7 +93,7 @@ $(function() {
         <strong>${title}</strong>
        </a>
       <small class="article-hostname ${hostName}">(${hostName})</small>
-      <small class="author">by ${author}</small>
+      <small class="article-author">by ${author}</small>
       </li>`);
     $allArticlesList.append($li);
     $submitForm.slideUp('slow');
@@ -143,7 +153,7 @@ function firstTenStories($allArticlesList) {
             <strong>${story.title}</strong>
            </a>
           <small class="article-hostname ${hostName}">(${hostName})</small>
-          <small class="author">by ${story.author}</small>
+          <small class="article-author">by ${story.author}</small>
           </li>`);
       $allArticlesList.append($li);
     });
