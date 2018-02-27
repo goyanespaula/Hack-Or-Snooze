@@ -39,6 +39,7 @@ function firstTenStories($allArticlesList) {
 }
 
 function generateFaves($favoritedArticles) {
+  // generate completely differently 
   $favoritedArticles.empty();
   let $favorites = $("#all-articles-list .favorite");
   let favoritesMessage = "<h5>No favorites added!</h5>";
