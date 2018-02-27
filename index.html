@@ -14,14 +14,19 @@
   <nav>
     <h1>Hack or Snooze</h1>
     <section class="nav-links">
-      <a href="#" id="nav-submit">submit</a>
+      <a class="nav-link" href="#" id="nav-submit">submit</a>
       <span>|</span>
-      <a href="#" id="nav-favorites">favorites</a>
-      <a href="#" id="nav-all" class="hidden">all</a>
+      <a class="nav-link" href="#" id="nav-favorites">favorites</a>
+      <a class="nav-link hidden" href="#" id="nav-all">all</a>
     </section>
+    <a class="nav-link" href="#" id="nav-login" class="">login</a>
   </nav>
   <section class="articles-container">
-    <form action="" class="hidden">
+    <form action="" class="hidden" id="submit-form">
+      <div class="submit-articles-input">
+        <label for="author">author</label>
+        <input id="author" type="text" placeholder="author name">
+      </div>
       <div class="submit-articles-input">
         <label for="title">title</label>
         <input id="title" type="text" placeholder="article title">
@@ -43,6 +48,7 @@
              <strong>Visualizing Algorithms</strong>
           </a>
           <small class="article-hostname">(visualgo.net)</small>
+          <small class="author">by Paula Goyanes</small>
         </li>
         <li id="2" class="id-2">
           <span class="star">
@@ -52,6 +58,7 @@
             <strong>Take Classes w/ Rithm</strong>
           </a>
           <small class="article-hostname">(rithmschool.com)</small>
+          <small class="author">by Paula Goyanes</small>
         </li>
         <li id="3" class="id-3">
           <span class="star">
@@ -61,6 +68,7 @@
             <strong>Analysis: 100 Years of Solitude</strong>
           </a>
           <small class="article-hostname">(nytimes.com)</small>
+          <small class="author">by Paula Goyanes</small>
         </li>
       </ol>
     </article>
@@ -72,6 +80,35 @@
       <ul id="filtered-articles" class="hidden articles-list">
       </ul>
     </article>
+    <form action="#" id="login-form" class="account-form hidden" method="post">
+      <h4>Login</h4>
+      <div class="login-input">
+        <label for="login-username">username</label>
+        <input id="login-username" type="text">
+      </div>
+      <div class="login-input">
+        <label for="login-password">password</label>
+        <input id="login-password" type="password">
+      </div>
+      <button type="submit">login</button>
+      <hr>
+    </form>
+    <form action="#" id="create-account-form" class="account-form hidden" method="post">
+      <h4>Create Account</h4>
+      <div class="login-input">
+        <label for="create-account-name">name</label>
+        <input id="create-account-name" type="text">
+      </div>
+      <div class="login-input">
+        <label for="create-account-username">username</label>
+        <input id="create-account-username" type="text">
+      </div>
+      <div class="login-input">
+        <label for="create-account-password">password</label>
+        <input id="create-account-password" type="password">
+      </div>
+      <button type="submit">create account</button>
+    </form>
   </section>
 </body>
 <script src="https://code.jquery.com/jquery-3.3.1.js" integrity="sha256-2Kok7MbOyxpgUVvAk/HJ2jigOSYS2auK4Pfzbm7uH60=" crossorigin="anonymous"></script>

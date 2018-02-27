@@ -1,8 +1,11 @@
 var id = 3;
 
-$(function () {
+$(function() {
+  var $navLogin = $('#nav-login');
+  var $loginForm = $('#login-form');
+  var $createAccountForm = $('#create-account-form');
   var $articlesContainer = $('.articles-container');
-  var $form = $('form');
+  var $submitForm = $('#submit-form');
   var $allArticlesList = $('#all-articles-list');
   var $nav = $('nav');
   var $navSubmit = $('#nav-submit');
@@ -11,24 +14,46 @@ $(function () {
   var $favoritedArticles = $('#favorited-articles');
   var $filteredArticles = $('#filtered-articles');
 
+  firstTenStories($allArticlesList);
+
+  $createAccountForm.on('submit', e=> {
+    e.preventDefault();
+    var name = $('#create-account-name').val();
+    var username = $('#create-account-username').val();
+    var password = $('#create-account-password').val();
+    createUser(name, username, password).then(function() {
+      getToken(username, password);
+    });
+    $createAccountForm.trigger("reset");
+  });
+
+  $navLogin.on('click', e=> {
+    $loginForm.slideDown();
+    $createAccountForm.slideDown();
+    $submitForm.hide();
+    $allArticlesList.hide();
+    $filteredArticles.hide();
+    $favoritedArticles.hide();
+  });  
+
   $navSubmit.on('click', e => {
     $favoritedArticles.hide();
     $allArticlesList.show();
     $filteredArticles.hide();
+    $loginForm.hide();
+    $createAccountForm.hide();
     if ($navAll.is(':visible')) {
       $navAll.hide();
       $navFavorites.show();
     }
-    if ($form.is(':hidden')) {
-      $form.slideDown();
-    } else {
-      $form.slideUp();
-    }
+    $submitForm.slideToggle();
   });
 
   $nav.on('click', '#nav-favorites, #nav-all', e => {
-    $form.hide();
+    $submitForm.hide();
     $filteredArticles.hide();
+    $loginForm.hide();
+    $createAccountForm.hide();
     if ($navFavorites.is(':visible')) {
       $navFavorites.hide();
       $navAll.show();
@@ -43,42 +68,41 @@ $(function () {
     }
   });
 
-  $form.on('submit', e => {
+  $submitForm.on('submit', e => {
     e.preventDefault();
     let title = $('#title').val();
     let url = $('#url').val()
     let hostName = getHostName(url);
+    let author = $('#author').val();
     id++;
     let $li = $(`<li id="${id}" class="id-${id}">
       <span class="star">
       <i class="far fa-star"></i>
       </span>
-      <a class="article-link" href="${url}">
+      <a class="article-link" href="${url}" target="a_blank">
         <strong>${title}</strong>
        </a>
       <small class="article-hostname ${hostName}">(${hostName})</small>
+      <small class="author">by ${author}</small>
       </li>`);
     $allArticlesList.append($li);
-    $form.slideUp('slow');
-    $form.trigger('reset');
+    $submitForm.slideUp('slow');
+    $submitForm.trigger('reset');
   });
 
   $articlesContainer.on('click', '.star', e => {
     let $closestLi = $(e.target).closest('li');
-    // let $closestSpan = $(e.target).closest('span');
     let $liID = $closestLi.attr('id');
     if ($closestLi.hasClass('favorite')) {
       removeFromFavorites($liID, $favoritedArticles);
     } else {
       addtoFavorites($liID, $favoritedArticles);
-        // $closestSpan.html(`<i class='fas fa-star'></i>`);
-        // $closestLi.toggleClass("favorite");
     }
   });
 
   $articlesContainer.on('click', '.article-hostname', e => {
     let selectedHost = $(e.target).text();
-    $form.hide();
+    $submitForm.hide();
     $allArticlesList.hide();
     $favoritedArticles.hide();
     $navFavorites.hide();
@@ -99,6 +123,31 @@ function getHostName(url) {
     hostName = hostName.slice(4);
   }
   return hostName;
+}
+
+function getStories() {
+  return $.getJSON("https://hack-or-snooze.herokuapp.com/stories?skip=0&limit=10");
+}
+
+function firstTenStories($allArticlesList) {
+  getStories().then(function(stories) {
+    stories.data.forEach(function(story) {
+      id++;
+      let url = story.url;
+      let hostName = getHostName(url);
+      var $li = $(`<li id="${id}" class="id-${id}">
+          <span class="star">
+          <i class="far fa-star"></i>
+          </span>
+          <a class="article-link" href="${story.url}" target="a_blank">
+            <strong>${story.title}</strong>
+           </a>
+          <small class="article-hostname ${hostName}">(${hostName})</small>
+          <small class="author">by ${story.author}</small>
+          </li>`);
+      $allArticlesList.append($li);
+    });
+  });
 }
 
 function generateFaves($favoritedArticles) {
@@ -134,10 +183,51 @@ function addtoFavorites($liID) {
 
 function generateFiltered(selectedHost, $filteredArticles) {
   $filteredArticles.empty();
-  let $hostNameElements = $('#all-articles-list>li>small');
+  let $hostNameElements = $('#all-articles-list>li>.article-hostname');
   for (let i = 0; i < $hostNameElements.length; i++) {
     if ($hostNameElements.eq(i).text() === selectedHost) {
       $hostNameElements.eq(i).closest('li').clone().appendTo($filteredArticles);
     }
   }
+}
+
+
+function createUser(name, username, password) {
+  return $.ajax({
+    method: "POST",
+    url: "https://hack-or-snooze.herokuapp.com/users",
+    data: {
+      data: {
+        name: name,
+        username: username,
+        password: password
+      }
+    }
+  });
+}
+
+function getToken(username, password) {
+  return $.ajax({
+    method: "POST",
+    url: "https://hack-or-snooze.herokuapp.com/auth",
+    data: {
+      data: {
+        username: username,
+        password: password
+      }
+    }
+  }).then(function(val) {
+    localStorage.setItem("token", val.data.token);
+  });
+}
+
+function checkUser() {
+  $.ajax({
+    method: "GET",
+    url: "https://hack-or-snooze.herokuapp.com/users/bobbyface3",
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem("token")}`
+    }
+  }).then(function(val) {
+  });
 }

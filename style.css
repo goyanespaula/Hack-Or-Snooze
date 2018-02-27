@@ -37,11 +37,15 @@ a:hover {
   display: flex;
   align-items: center;
   margin: 0 15px;
-  font-size: .85rem;
 }
 
-.nav-links>* {
+.nav-link {
+  font-size: .85rem;
   margin: 0 3px;
+}
+
+#nav-login {
+  margin-left: auto;
 }
 
 .articles-container {
@@ -65,7 +69,7 @@ form label {
   font-size: .9rem;
   font-weight: 700;
   display: inline-block;
-  width: 35px;
+  width: 50px;
   text-align: right;
   margin-right: 5px;
 }
@@ -107,6 +111,15 @@ form>hr {
   border: .5px solid lightgray;
 }
 
+.login-input label {
+  width: 70px;
+}
+
+.account-form button {
+  width: 150px;
+  margin-left: 80px;
+}
+
 .articles-list {
   margin: 20px 5px;
 }
@@ -114,7 +127,7 @@ form>hr {
 .articles-list>li {
   color: gray;
   font-size: .8rem;
-  margin: 18px 0;
+  margin: 10px 0;
   cursor: pointer;
 }
 
@@ -146,6 +159,12 @@ form>hr {
 
 .hidden {
   display: none;
+}
+
+.author {
+  display: block;
+  margin-top: 5px;
+  margin-left: 25px;
 }
 
 @media screen and (max-width: 576px) {
