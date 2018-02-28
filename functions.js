@@ -17,7 +17,7 @@ function getStories() {
   );
 }
 
-function firstTenStories($allArticlesList) {
+function generateTenStories($allArticlesList) {
   getStories().then(function (stories) {
     $allArticlesList.empty();
     stories.data.forEach(function (storyObject) {
@@ -51,47 +51,6 @@ function isFavorite(storyObject) {
   return favStoryIds.includes(storyObject.storyId);
 }
 
-function generateFaves($favoritedArticles) {
-  $favoritedArticles.empty();
-  let favoritesMessage = "<h5>No favorites added!</h5>";
-  let favStoryIds = userObject.data.favorites.map(obj => obj.storyId);
-  favStoryIds.forEach(function (storyId) {
-    $(`#all-articles-list .id-${storyId}`).clone().appendTo($favoritedArticles)
-  });
-  if ($favoritedArticles.is(":empty")) {
-    $favoritedArticles.append(favoritesMessage);
-  }
-}
-
-function generateMyStories($myArticles) {
-  let storiesArr = userObject.data.stories;
-  let message = "<h5>No stories added by user yet!</h5>"
-  $myArticles.empty();
-  storiesArr.forEach(function (storyObj) {
-    let url = storyObj.url;
-    let hostName = getHostName(url);
-    let author = storyObj.author;
-    let title = storyObj.title;
-    let favoriteClass = isFavorite(storyObj) ? "favorite" : "";
-    var $li = $(`<li id="${storyObj.storyId}" class="${favoriteClass} id-${storyObj.storyId}">
-          <span class="trash-can">
-           <i class="fas fa-trash-alt"></i>
-          </span>
-          <a class="article-link" href="${url}" target="a_blank">
-            <strong>${title}</strong>
-           </a>
-          <small class="article-hostname ${hostName}">(${hostName})</small>
-          <small class="article-author">by ${author}</small>
-          </li>`);
-    $myArticles.append($li);
-  });
-  if ($myArticles.is(':empty')) {
-    $myArticles.append(message);
-  }
-  $myArticles.show();
-}
-
-
 function removeFromAPIFavorites(username, storyId) {
   return $.ajax({
     method: "DELETE",
@@ -102,7 +61,7 @@ function removeFromAPIFavorites(username, storyId) {
   });
 }
 
-function removeFromFavorites(storyId, $favoritedArticles) {
+function removeFromDOMFavorites(storyId, $favoritedArticles) {
   let $unfavoritedList = $(`.id-${storyId}`);
   for (let i = 0; i < $unfavoritedList.length; i++) {
     let $closestSpan = $unfavoritedList.eq(i).find(".star");
@@ -122,7 +81,7 @@ function addToAPIFavorites(username, storyId) {
   })
 }
 
-function addToFavorites(storyId) {
+function addToDOMFavorites(storyId) {
   let $unfavoritedList = $(`.id-${storyId}`);
   for (let i = 0; i < $unfavoritedList.length; i++) {
     let $closestSpan = $unfavoritedList.eq(i).find(".star");
@@ -131,6 +90,54 @@ function addToFavorites(storyId) {
   }
 }
 
+function generateFaves($favoritedArticles) {
+  $favoritedArticles.empty();
+  let favoritesMessage = "<h5>No favorites added!</h5>";
+  let favStoryIds = userObject.data.favorites.map(obj => obj.storyId);
+  favStoryIds.forEach(function(storyId) {
+    $(`#all-articles-list .id-${storyId}`)
+      .clone()
+      .appendTo($favoritedArticles);
+  });
+  if ($favoritedArticles.is(":empty")) {
+    $favoritedArticles.append(favoritesMessage);
+  }
+}
+
+function generateMyStories($myArticles) {
+  let storiesArr = userObject.data.stories;
+  let message = "<h5>No stories added by user yet!</h5>";
+  $myArticles.empty();
+  storiesArr.forEach(function(storyObj) {
+    let url = storyObj.url;
+    let hostName = getHostName(url);
+    let author = storyObj.author;
+    let title = storyObj.title;
+    let favoriteClass = isFavorite(storyObj) ? "favorite" : "";
+    var $li = $(`<li id="${storyObj.storyId}" class="${favoriteClass} id-${
+      storyObj.storyId
+    }">
+          <span class="trash-can">
+           <i class="fas fa-trash-alt"></i>
+          </span>
+          <span class="pencil">
+           <i class="fas fa-pencil-alt"></i>
+          </span>
+          <a class="article-link" href="${url}" target="a_blank">
+            <strong>${title}</strong>
+           </a>
+          <small class="article-hostname ${hostName}">(${hostName})</small>
+          <small class="article-author">by ${author}</small>
+          </li>`);
+    $myArticles.append($li);
+  });
+  if ($myArticles.is(":empty")) {
+    $myArticles.append(message);
+  }
+  $myArticles.show();
+}
+
+// refactor to use the API
 function generateFiltered(selectedHost, $filteredArticles) {
   $filteredArticles.empty();
   let $hostNameElements = $("#all-articles-list>li>.article-hostname");

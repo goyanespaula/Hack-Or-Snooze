@@ -138,13 +138,7 @@ form>hr {
   cursor: pointer;
 }
 
-.star {
-  font-size: .7rem;
-  margin: 0 2px;
-  cursor: pointer;
-}
-
-.trash-can {
+.star, .trash-can, .pencil {
   font-size: .75rem;
   margin: 0 2px;
   cursor: pointer;
@@ -152,6 +146,10 @@ form>hr {
 
 .trash-can:hover {
   color: crimson;
+}
+
+.pencil:hover {
+  color: darkblue;
 }
 
 .article-link>strong {

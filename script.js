@@ -6,25 +6,24 @@ var userObject;
 
 $(function () {
   var $body = $("body");
+  var $articlesContainer = $(".articles-container");
+  var $allArticlesList = $("#all-articles-list");
+  var $submitForm = $("#submit-form");
+  var $favoritedArticles = $("#favorited-articles");
+  var $filteredArticles = $("#filtered-articles");
   var $loginForm = $("#login-form");
   var $createAccountForm = $("#create-account-form");
-  var $articlesContainer = $(".articles-container");
-  var $submitForm = $("#submit-form");
-  var $allArticlesList = $("#all-articles-list");
+  var $myArticles = $("#my-articles");
   var $navLogin = $("#nav-login");
   var $navWelcome = $("#nav-welcome");
   var $navUserProfile = $('#nav-user-profile');
   var $navLogOut = $("#nav-logout");
   var $navSubmit = $("#nav-submit");
-  var $navAll = $("#nav-all");
-  var $navMyFavorites = $("#nav-my-favorites");
-  var $favoritedArticles = $("#favorited-articles");
-  var $filteredArticles = $("#filtered-articles");
-  var $myArticles = $("#my-articles");
   var $userProfile = $("#user-profile");
   var $profileName = $("#profile-name");
   var $profileUsername = $("#profile-username");
   var $profileAccountDate = $("#profile-account-date");
+  var elementsForHiding = [$allArticlesList, $submitForm, $favoritedArticles, $filteredArticles, $loginForm, $createAccountForm, $userProfile];
 
   if (token) {
     payload = token.split(".")[1] || undefined;
@@ -39,11 +38,10 @@ $(function () {
       $navUserProfile.text(globalUsername);
       $navWelcome.show();
       $navLogOut.show();
-      $myArticles.hide();
-      firstTenStories($allArticlesList);
+      generateTenStories($allArticlesList);
     });
   } else {
-    firstTenStories($allArticlesList);
+    generateTenStories($allArticlesList);
   }
 
   /* SUBMITTING EVENTS */
@@ -60,13 +58,12 @@ $(function () {
         userObject = user;
         $navUserProfile.text(`${userObject.data.username}`);
         $navLogin.hide();
-        $loginForm.hide();
-        $createAccountForm.hide();
         $navWelcome.show();
         $navLogOut.show();
+        $loginForm.hide();
+        $createAccountForm.hide();
         $allArticlesList.show();
-        $myArticles.hide();
-        firstTenStories($allArticlesList);
+        generateTenStories($allArticlesList);
       })
       .catch(function (error) {
         alert("USERNAME OR PASSWORD INVALID");
@@ -90,17 +87,16 @@ $(function () {
           })
           .then(function (user) {
             userObject = user;
-            $navWelcome.html(`${userObject.data.username}`);
+            $navUserProfile.text(`${userObject.data.username}`);
             $navLogin.hide();
-            $loginForm.hide();
-            $createAccountForm.hide();
             $navWelcome.show();
             $navLogOut.show();
+            $loginForm.hide();
+            $createAccountForm.hide();
             $allArticlesList.show();
-            $myArticles.hide();
           });
       })
-      .catch(function (error) {
+      .catch(function(error) {
         alert("Woops, this user already exists. Login instead.");
       });
 
@@ -162,12 +158,12 @@ $(function () {
       if ($closestLi.hasClass("favorite")) {
         removeFromAPIFavorites(globalUsername, storyId).then(function (user) {
           userObject = user;
-          removeFromFavorites(storyId, $favoritedArticles);
+          removeFromDOMFavorites(storyId, $favoritedArticles);
         });
       } else {
         addToAPIFavorites(globalUsername, storyId).then(function (user) {
           userObject = user;
-          addToFavorites(storyId, $favoritedArticles);
+          addToDOMFavorites(storyId, $favoritedArticles);
         })
       }
     }
@@ -178,7 +174,7 @@ $(function () {
   $myArticles.on("click", ".trash-can", e => {
     let $closestLi = $(e.target).closest("li");
     let storyId = $closestLi.attr("id");
-    deleteStory(storyId).then(function () {
+    deleteStory(storyId).then(function() {
       getUser(globalUsername).then(function (user) {
         userObject = user;
         generateMyStories($myArticles);
@@ -208,19 +204,19 @@ $(function () {
     $createAccountForm.slideDown();
     $submitForm.hide();
     $allArticlesList.hide();
-    $filteredArticles.hide();
     $favoritedArticles.hide();
+    $filteredArticles.hide();
     $myArticles.hide();
   });
   // NAVIGATE TO LOGIN END
 
   // NAVIGATE TO USER PROFILE
   $navUserProfile.on("click", e => {
+    $submitForm.hide();
     $allArticlesList.hide();
-    $myArticles.hide();
     $favoritedArticles.hide();
     $filteredArticles.hide();
-    $submitForm.hide();
+    $myArticles.hide();
     $userProfile.show();
   });
   // END NAVIGATE TO USER PROFILE
@@ -238,12 +234,12 @@ $(function () {
       );
     } else {
       $favoritedArticles.hide();
-      $myArticles.hide();
-      $allArticlesList.show();
       $filteredArticles.hide();
+      $myArticles.hide();
       $loginForm.hide();
       $createAccountForm.hide();
       $userProfile.hide();
+      $allArticlesList.show();
 
       $submitForm.slideToggle();
     }
@@ -253,15 +249,13 @@ $(function () {
   // NAVIGATING TO FAVORITES
   $body.on("click", "#nav-favorites, #profile-favorites", e => {
     $submitForm.hide();
+    $allArticlesList.hide();
     $filteredArticles.hide();
-    $loginForm.hide();
-    $createAccountForm.hide();
     $myArticles.hide();
+    $userProfile.hide();
     if (!token) {
       mustLogin($loginForm, $createAccountForm, $submitForm, $allArticlesList, $filteredArticles, $favoritedArticles);
     } else {
-      $userProfile.hide();
-      $allArticlesList.hide();
       generateFaves($favoritedArticles, userObject);
       $favoritedArticles.show();
     }
@@ -271,33 +265,32 @@ $(function () {
   // NAVIGATING TO ALL
   $body.on("click", "#nav-all", e => {
     $submitForm.hide();
+    $favoritedArticles.hide();
     $filteredArticles.hide();
+    $myArticles.hide();
     $loginForm.hide();
     $createAccountForm.hide();
-    $myArticles.hide();
-    $favoritedArticles.hide();
     $userProfile.hide();
     $allArticlesList.show();
-    firstTenStories($allArticlesList);
+    generateTenStories($allArticlesList);
   });
   // END NAVIGATING TO ALL
 
   // NAVIGATING TO MY STORIES
   $body.on("click", "#profile-my-stories, #nav-my-stories", e => {
     $submitForm.hide();
+    $favoritedArticles.hide();
     $filteredArticles.hide();
     $loginForm.hide();
     $createAccountForm.hide();
-    $favoritedArticles.hide();
     $allArticlesList.hide();
     if (!token) {
       mustLogin($loginForm, $createAccountForm, $submitForm, $allArticlesList, $filteredArticles, $favoritedArticles);
     } else {
       $userProfile.hide();
-      generateMyStories($myArticles)
+      generateMyStories($myArticles);
       $myArticles.show();
     }
   });
   // END NAVIGATING TO MY STORIES
-
 });
