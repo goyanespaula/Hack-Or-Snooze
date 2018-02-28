@@ -20,6 +20,7 @@ $(function () {
   var $navMyFavorites = $("#nav-my-favorites");
   var $favoritedArticles = $("#favorited-articles");
   var $filteredArticles = $("#filtered-articles");
+  var $myArticles = $("#my-articles");
   var $userProfile = $("#user-profile");
   var $profileName = $("#profile-name");
   var $profileUsername = $("#profile-username");
@@ -29,7 +30,7 @@ $(function () {
     payload = token.split(".")[1] || undefined;
     parsedPayload = JSON.parse(atob(payload));
     globalUsername = parsedPayload.username;
-    getUser(globalUsername).then(function(user) {
+    getUser(globalUsername).then(function (user) {
       userObject = user;
       $profileName.text(`Name: ${userObject.data.name}`);
       $profileUsername.text(`Username: ${userObject.data.username}`);
@@ -38,6 +39,7 @@ $(function () {
       $navUserProfile.text(globalUsername);
       $navWelcome.show();
       $navLogOut.show();
+      $myArticles.hide();
       firstTenStories($allArticlesList);
     });
   } else {
@@ -51,10 +53,10 @@ $(function () {
     let username = $("#login-username").val();
     let password = $("#login-password").val();
     getToken(username, password)
-      .then(function() {
+      .then(function () {
         return getUser(globalUsername);
       })
-      .then(function(user) {
+      .then(function (user) {
         userObject = user;
         $navUserProfile.text(`${userObject.data.username}`);
         $navLogin.hide();
@@ -63,9 +65,10 @@ $(function () {
         $navWelcome.show();
         $navLogOut.show();
         $allArticlesList.show();
+        $myArticles.hide();
         firstTenStories($allArticlesList);
       })
-      .catch(function(error) {
+      .catch(function (error) {
         alert("USERNAME OR PASSWORD INVALID");
       });
 
@@ -94,9 +97,10 @@ $(function () {
             $navWelcome.show();
             $navLogOut.show();
             $allArticlesList.show();
+            $myArticles.hide();
           });
       })
-      .catch(function(error) {
+      .catch(function (error) {
         alert("Woops, this user already exists. Login instead.");
       });
 
@@ -130,7 +134,7 @@ $(function () {
       <small class="article-author">by ${author}</small>
       </li>`);
       $allArticlesList.prepend($li);
-      getUser(globalUsername).then(function(user) {
+      getUser(globalUsername).then(function (user) {
         userObject = user;
       });
     });
@@ -156,7 +160,7 @@ $(function () {
       let $closestLi = $(e.target).closest("li");
       let storyId = $closestLi.attr("id");
       if ($closestLi.hasClass("favorite")) {
-        removeFromAPIFavorites(globalUsername, storyId).then(function(user) {
+        removeFromAPIFavorites(globalUsername, storyId).then(function (user) {
           userObject = user;
           removeFromFavorites(storyId, $favoritedArticles);
         });
@@ -170,12 +174,26 @@ $(function () {
   });
   // END STARRING FAVORITED EVENT
 
+  // DELETING A STORY
+  $myArticles.on("click", ".trash-can", e => {
+    let $closestLi = $(e.target).closest("li");
+    let storyId = $closestLi.attr("id");
+    deleteStory(storyId).then(function () {
+      getUser(globalUsername).then(function (user) {
+        userObject = user;
+        generateMyStories($myArticles);
+      })
+    });
+  });
+  // END DELETING A STORY
+
   // FILTERING ARTICLES EVENT
   $articlesContainer.on("click", ".article-hostname", e => {
     let selectedHost = $(e.target).text();
     $submitForm.hide();
     $allArticlesList.hide();
     $favoritedArticles.hide();
+    $myArticles.hide();
     generateFiltered(selectedHost, $filteredArticles);
     $filteredArticles.show();
   });
@@ -192,12 +210,14 @@ $(function () {
     $allArticlesList.hide();
     $filteredArticles.hide();
     $favoritedArticles.hide();
+    $myArticles.hide();
   });
   // NAVIGATE TO LOGIN END
 
   // NAVIGATE TO USER PROFILE
   $navUserProfile.on("click", e => {
     $allArticlesList.hide();
+    $myArticles.hide();
     $favoritedArticles.hide();
     $filteredArticles.hide();
     $submitForm.hide();
@@ -218,6 +238,7 @@ $(function () {
       );
     } else {
       $favoritedArticles.hide();
+      $myArticles.hide();
       $allArticlesList.show();
       $filteredArticles.hide();
       $loginForm.hide();
@@ -235,6 +256,7 @@ $(function () {
     $filteredArticles.hide();
     $loginForm.hide();
     $createAccountForm.hide();
+    $myArticles.hide();
     if ($(e.target).attr("id") === "nav-favorites" || $(e.target).attr("id") === "profile-favorites") {
       if (!token) {
         mustLogin($loginForm, $createAccountForm, $submitForm, $allArticlesList, $filteredArticles, $favoritedArticles);
@@ -248,7 +270,27 @@ $(function () {
       $favoritedArticles.hide();
       $userProfile.hide();
       $allArticlesList.show();
+      firstTenStories($allArticlesList);
     }
   });
   // END NAVIGATING TO ALL & FAVORITES
+
+  // NAVIGATING TO MY STORIES
+  $body.on("click", "#profile-my-stories, #nav-my-stories", e => {
+    $submitForm.hide();
+    $filteredArticles.hide();
+    $loginForm.hide();
+    $createAccountForm.hide();
+    $favoritedArticles.hide();
+    $allArticlesList.hide();
+    if (!token) {
+      mustLogin($loginForm, $createAccountForm, $submitForm, $allArticlesList, $filteredArticles, $favoritedArticles);
+    } else {
+      $userProfile.hide();
+      generateMyStories($myArticles)
+      $myArticles.show();
+    }
+  });
+  // END NAVIGATING TO MY STORIES
+
 });

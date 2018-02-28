@@ -165,7 +165,7 @@ form>hr {
   margin-left: 25px;
 }
 
-#favorited-articles, #filtered-articles {
+#favorited-articles, #filtered-articles, #my-articles {
   list-style: none;
   padding-left: 20px;
 }

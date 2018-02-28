@@ -18,9 +18,9 @@ function getStories() {
 }
 
 function firstTenStories($allArticlesList) {
-  getStories().then(function(stories) {
+  getStories().then(function (stories) {
     $allArticlesList.empty();
-    stories.data.forEach(function(storyObject) {
+    stories.data.forEach(function (storyObject) {
       let url = storyObject.url;
       let hostName = getHostName(url);
       let starType = isFavorite(storyObject) ? "fas" : "far";
@@ -55,13 +55,38 @@ function generateFaves($favoritedArticles) {
   $favoritedArticles.empty();
   let favoritesMessage = "<h5>No favorites added!</h5>";
   let favStoryIds = userObject.data.favorites.map(obj => obj.storyId);
-  favStoryIds.forEach(function(storyId) {
+  favStoryIds.forEach(function (storyId) {
     $(`#all-articles-list .id-${storyId}`).clone().appendTo($favoritedArticles)
   });
   if ($favoritedArticles.is(":empty")) {
     $favoritedArticles.append(favoritesMessage);
   }
 }
+
+function generateMyStories($myArticles) {
+  let storiesArr = userObject.data.stories;
+  $myArticles.empty();
+  storiesArr.forEach(function (storyObj) {
+    let url = storyObj.url;
+    let hostName = getHostName(url);
+    let author = storyObj.author;
+    let title = storyObj.title;
+    let favoriteClass = isFavorite(storyObj) ? "favorite" : "";
+    var $li = $(`<li id="${storyObj.storyId}" class="${favoriteClass} id-${storyObj.storyId}">
+          <span class="trash-can">
+           <i class="fas fa-trash-alt"></i>
+          </span>
+          <a class="article-link" href="${url}" target="a_blank">
+            <strong>${title}</strong>
+           </a>
+          <small class="article-hostname ${hostName}">(${hostName})</small>
+          <small class="article-author">by ${author}</small>
+          </li>`);
+    $myArticles.append($li);
+  });
+  $myArticles.show();
+}
+
 
 function removeFromAPIFavorites(username, storyId) {
   return $.ajax({
@@ -173,6 +198,16 @@ function addStory(title, url, author) {
         author,
         url
       }
+    }
+  });
+}
+
+function deleteStory(storyId) {
+  return $.ajax({
+    method: "DELETE",
+    url: `https://hack-or-snooze.herokuapp.com/stories/${storyId}`,
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem("token")}`
     }
   });
 }

@@ -25,7 +25,9 @@
       <a class="nav-link" href="#" id="nav-submit">submit</a>
     </section>
     <a class="nav-link nav-right" href="#" id="nav-login">login</a>
-    <span class="nav-link nav-right hidden" id="nav-welcome"><a href="#" id="nav-user-profile"></a></span>
+    <span class="nav-link nav-right hidden" id="nav-welcome">
+      <a href="#" id="nav-user-profile"></a>
+    </span>
     <a class="hidden" id="nav-logout" href="#">
       <small>(logout)</small>
     </a>
@@ -57,6 +59,10 @@
     </article>
     <article>
       <ul id="filtered-articles" class="hidden articles-list">
+      </ul>
+    </article>
+    <article>
+      <ul id="my-articles" class="hidden articles-list">
       </ul>
     </article>
   </section>
@@ -100,7 +106,7 @@
     </section>
     <a href="#" id="profile-favorites">favorites</a>
     <span>|</span>
-    <a href="#">my stories</a>
+    <a href="#" id="profile-my-stories">my stories</a>
   </section>
 </body>
 <script src="https://code.jquery.com/jquery-3.3.1.js" integrity="sha256-2Kok7MbOyxpgUVvAk/HJ2jigOSYS2auK4Pfzbm7uH60=" crossorigin="anonymous"></script>
