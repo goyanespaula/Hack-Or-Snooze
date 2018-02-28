@@ -22,9 +22,11 @@ function firstTenStories($allArticlesList) {
     stories.data.forEach(function (storyObject) {
       let url = storyObject.url;
       let hostName = getHostName(url);
-      var $li = $(`<li id="${storyObject.storyId}">
+      let starType = isFavorite(storyObject) ? "fas" : "far";
+      let favoriteClass = isFavorite(storyObject) ? "favorite" : "";
+      var $li = $(`<li id="${storyObject.storyId}" class="${favoriteClass}">
           <span class="star">
-          <i class="far fa-star"></i>
+          <i class="${starType} fa-star"></i>
           </span>
           <a class="article-link" href="${storyObject.url}" target="a_blank">
             <strong>${storyObject.title}</strong>
@@ -37,12 +39,17 @@ function firstTenStories($allArticlesList) {
   });
 }
 
-function generateFaves($favoritedArticles, userObject) {
+function isFavorite(storyObject) {
+  var favStoryIds = userObject.data.favorites.map(obj => obj.storyId);
+  return favStoryIds.includes(storyObject.storyId);
+}
+
+function generateFaves($favoritedArticles) {
   $favoritedArticles.empty();
   var favStoryIds = userObject.data.favorites.map(obj => obj.storyId);
-  favStoryIds.forEach(function (storyId) {
+  favStoryIds.forEach(function(storyId) {
     $(`#all-articles-list #${storyId}`).clone().appendTo($favoritedArticles)
-  })
+  });
   let favoritesMessage = "<h5>No favorites added!</h5>";
   if ($favoritedArticles.is(":empty")) {
     $favoritedArticles.append(favoritesMessage);
@@ -59,8 +66,8 @@ function removeFromAPIFavorites(username, storyId) {
   })
 }
 
-function removeFromFavorites($liID, $favoritedArticles) {
-  let $unfavoritedList = $(`#${$liID}`);
+function removeFromFavorites(storyId, $favoritedArticles) {
+  let $unfavoritedList = $(`#${storyId}`);
   for (let i = 0; i < $unfavoritedList.length; i++) {
     let $closestSpan = $unfavoritedList.eq(i).find(".star");
     $closestSpan.html('<i class="far fa-star"></i>');
@@ -79,8 +86,8 @@ function addToAPIFavorites(username, storyId) {
   })
 }
 
-function addToFavorites($liID) {
-  let $unfavoritedList = $(`#${$liID}`);
+function addToFavorites(storyId) {
+  let $unfavoritedList = $(`#${storyId}`);
   for (let i = 0; i < $unfavoritedList.length; i++) {
     let $closestSpan = $unfavoritedList.eq(i).find(".star");
     $closestSpan.html('<i class="fas fa-star"></i>');
