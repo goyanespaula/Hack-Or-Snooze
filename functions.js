@@ -18,41 +18,49 @@ function getStories() {
 }
 
 function firstTenStories($allArticlesList) {
-  getStories().then(function(stories) {
-    stories.data.forEach(function(story) {
-      id++;
-      let url = story.url;
+  getStories().then(function (stories) {
+    stories.data.forEach(function (storyObject) {
+      let url = storyObject.url;
       let hostName = getHostName(url);
-      var $li = $(`<li id="${id}" class="id-${id}">
+      var $li = $(`<li id="${storyObject.storyId}">
           <span class="star">
           <i class="far fa-star"></i>
           </span>
-          <a class="article-link" href="${story.url}" target="a_blank">
-            <strong>${story.title}</strong>
+          <a class="article-link" href="${storyObject.url}" target="a_blank">
+            <strong>${storyObject.title}</strong>
            </a>
           <small class="article-hostname ${hostName}">(${hostName})</small>
-          <small class="article-author">by ${story.author}</small>
+          <small class="article-author">by ${storyObject.author}</small>
           </li>`);
       $allArticlesList.append($li);
     });
   });
 }
 
-function generateFaves($favoritedArticles) {
-  // generate completely differently 
+function generateFaves($favoritedArticles, userObject) {
   $favoritedArticles.empty();
-  let $favorites = $("#all-articles-list .favorite");
+  var favStoryIds = userObject.data.favorites.map(obj => obj.storyId);
+  favStoryIds.forEach(function (storyId) {
+    $(`#all-articles-list #${storyId}`).clone().appendTo($favoritedArticles)
+  })
   let favoritesMessage = "<h5>No favorites added!</h5>";
-  for (let i = 0; i < $favorites.length; i++) {
-    $favoritedArticles.append($favorites.eq(i).clone());
-  }
   if ($favoritedArticles.is(":empty")) {
     $favoritedArticles.append(favoritesMessage);
   }
 }
 
+function removeFromAPIFavorites(username, storyId) {
+  return $.ajax({
+    method: "DELETE",
+    url: `https://hack-or-snooze.herokuapp.com/users/${username}/favorites/${storyId}`,
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem("token")}`
+    }
+  })
+}
+
 function removeFromFavorites($liID, $favoritedArticles) {
-  let $unfavoritedList = $(`.id-${$liID}`);
+  let $unfavoritedList = $(`#${$liID}`);
   for (let i = 0; i < $unfavoritedList.length; i++) {
     let $closestSpan = $unfavoritedList.eq(i).find(".star");
     $closestSpan.html('<i class="far fa-star"></i>');
@@ -61,8 +69,18 @@ function removeFromFavorites($liID, $favoritedArticles) {
   generateFaves($favoritedArticles);
 }
 
-function addtoFavorites($liID) {
-  let $unfavoritedList = $(`.id-${$liID}`);
+function addToAPIFavorites(username, storyId) {
+  return $.ajax({
+    method: "POST",
+    url: `https://hack-or-snooze.herokuapp.com/users/${username}/favorites/${storyId}`,
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem("token")}`
+    }
+  })
+}
+
+function addToFavorites($liID) {
+  let $unfavoritedList = $(`#${$liID}`);
   for (let i = 0; i < $unfavoritedList.length; i++) {
     let $closestSpan = $unfavoritedList.eq(i).find(".star");
     $closestSpan.html('<i class="fas fa-star"></i>');
@@ -118,7 +136,7 @@ function getToken(username, password) {
         password: password
       }
     }
-  }).then(function(val) {
+  }).then(function (val) {
     localStorage.setItem("token", val.data.token);
     token = localStorage.getItem("token");
   });
@@ -127,7 +145,7 @@ function getToken(username, password) {
 function addStory(title, url, author) {
   return $.ajax({
     method: "POST",
-    url: "https://hack-or-snooze.herokuapp.com/stories?skip=0&limit=10",
+    url: "https://hack-or-snooze.herokuapp.com/stories",
     headers: {
       Authorization: `Bearer ${localStorage.getItem("token")}`
     },

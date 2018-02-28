@@ -1,4 +1,3 @@
-var id = 2;
 var token = localStorage.getItem("token");
 var payload;
 var parsedPayload;
@@ -9,12 +8,12 @@ if (token) {
   payload = token.split(".")[1] || undefined;
   parsedPayload = JSON.parse(atob(payload));
   username = parsedPayload.username;
-  getUser(username).then(function(user) {
+  getUser(username).then(function (user) {
     userObject = user;
   });
 }
 
-$(function() {
+$(function () {
   var $loginForm = $("#login-form");
   var $createAccountForm = $("#create-account-form");
   var $articlesContainer = $(".articles-container");
@@ -46,10 +45,10 @@ $(function() {
     var username = $("#login-username").val();
     var password = $("#login-password").val();
     getToken(username, password)
-      .then(function() {
+      .then(function () {
         return getUser(username);
       })
-      .then(function(user) {
+      .then(function (user) {
         userObject = user;
         $navWelcome.html(`Hi, ${userObject.data.username}`);
         $navLogin.hide();
@@ -59,7 +58,7 @@ $(function() {
         $navLogOut.show();
         $allArticlesList.show();
       })
-      .catch(function(error) {
+      .catch(function (error) {
         alert("USERNAME OR PASSWORD INVALID");
       });
 
@@ -74,12 +73,12 @@ $(function() {
     var username = $("#create-account-username").val();
     var password = $("#create-account-password").val();
     createUser(name, username, password)
-      .then(function() {
+      .then(function () {
         getToken(username, password)
-          .then(function() {
+          .then(function () {
             return getUser(username);
           })
-          .then(function(user) {
+          .then(function (user) {
             userObject = user;
             $navWelcome.html(`Hi, ${userObject.data.username}`);
             $navLogin.hide();
@@ -90,7 +89,7 @@ $(function() {
             $allArticlesList.show();
           });
       })
-      .catch(function(error) {
+      .catch(function (error) {
         alert("Woops, this user already exists.  Login instead.");
       });
 
@@ -99,7 +98,7 @@ $(function() {
   // END CREATING USER EVENT
 
   // CREATE LOGOUT EVENT
-  $navLogOut.on("click", function(e) {
+  $navLogOut.on("click", function (e) {
     localStorage.clear();
     location.reload();
   });
@@ -112,8 +111,8 @@ $(function() {
     let url = $("#url").val();
     let hostName = getHostName(url);
     let author = $("#author").val();
-    id++;
-    let $li = $(`<li id="${id}" class="id-${id}">
+    addStory(title, url, author).then(function (storyObject) {
+      let $li = $(`<li id="${storyObject.storyId}">
       <span class="star">
       <i class="far fa-star"></i>
       </span>
@@ -123,12 +122,11 @@ $(function() {
       <small class="article-hostname ${hostName}">(${hostName})</small>
       <small class="article-author">by ${author}</small>
       </li>`);
-    addStory(title, url, author).then(function() {
-      getUser(username).then(function(user) {
+      $allArticlesList.prepend($li);
+      getUser(username).then(function (user) {
         userObject = user;
       });
     });
-    $allArticlesList.prepend($li);
     $submitForm.slideUp("slow");
     $submitForm.trigger("reset");
   });
@@ -138,15 +136,29 @@ $(function() {
   /* GENERATING LISTS*/
   // STARRING FAVORITES EVENT
   $articlesContainer.on("click", ".star", e => {
-    // if !token, login, otherwise, do the following
-    let $closestLi = $(e.target).closest("li");
-    let $liID = $closestLi.attr("id");
-    if ($closestLi.hasClass("favorite")) {
-      removeFromFavorites($liID, $favoritedArticles);
-      // but also remove from the users favorites
+    if (!token) {
+      mustLogin(
+        $loginForm,
+        $createAccountForm,
+        $submitForm,
+        $allArticlesList,
+        $filteredArticles,
+        $favoritedArticles
+      )
     } else {
-      addtoFavorites($liID, $favoritedArticles);
-      // but also add to the users favorites
+      let $closestLi = $(e.target).closest("li");
+      let $liID = $closestLi.attr("id");
+      if ($closestLi.hasClass("favorite")) {
+        removeFromFavorites($liID, $favoritedArticles);
+        removeFromAPIFavorites(username, $liID).then(function (user) {
+          userObject = user;
+        })
+      } else {
+        addToFavorites($liID, $favoritedArticles);
+        addToAPIFavorites(username, $liID).then(function (user) {
+          userObject = user;
+        })
+      }
     }
   });
   // END STARRING FAVORITED EVENT
@@ -214,7 +226,7 @@ $(function() {
       $navFavorites.hide();
       $navAll.show();
       $allArticlesList.hide();
-      generateFaves($favoritedArticles);
+      generateFaves($favoritedArticles, userObject);
       $favoritedArticles.show();
     } else {
       $navFavorites.show();

@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -10,6 +11,7 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.0/normalize.css">
   <link rel="stylesheet" href="style.css" type="text/css">
 </head>
+
 <body>
   <nav>
     <h1>Hack or Snooze</h1>
@@ -21,7 +23,9 @@
     </section>
     <a class="nav-link nav-right" href="#" id="nav-login">login</a>
     <span class="nav-link nav-right hidden" id="nav-welcome"></span>
-    <a class="hidden" id="nav-logout" href="#"><small>(logout)</small></a>
+    <a class="hidden" id="nav-logout" href="#">
+      <small>(logout)</small>
+    </a>
   </nav>
   <section class="articles-container container">
     <form action="" class="hidden" id="submit-form">
@@ -42,26 +46,6 @@
     </form>
     <article>
       <ol id="all-articles-list" class="articles-list">
-        <li id="1" class="id-1">
-          <span class="star">
-            <i class="far fa-star"></i>
-          </span>
-          <a class="article-link" href="https://www.rithmschool.com/courses" target="a_blank">
-            <strong>Take Classes w/ Rithm</strong>
-          </a>
-          <small class="article-hostname">(rithmschool.com)</small>
-          <small class="article-author">by Paula Goyanes</small>
-        </li>
-        <li id="2" class="id-2">
-          <span class="star">
-            <i class="far fa-star"></i>
-          </span>
-          <a class="article-link" href="http://www.nytimes.com/books/97/06/15/reviews/marque-solitude.html" target="a_blank">
-            <strong>Analysis: 100 Years of Solitude</strong>
-          </a>
-          <small class="article-hostname">(nytimes.com)</small>
-          <small class="article-author">by Paula Goyanes</small>
-        </li>
       </ol>
     </article>
     <article>
@@ -108,4 +92,5 @@
 <script src="https://code.jquery.com/jquery-3.3.1.js" integrity="sha256-2Kok7MbOyxpgUVvAk/HJ2jigOSYS2auK4Pfzbm7uH60=" crossorigin="anonymous"></script>
 <script src="functions.js"></script>
 <script src="script.js"></script>
+
 </html>
