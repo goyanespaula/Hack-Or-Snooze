@@ -250,30 +250,37 @@ $(function () {
   });
   // NAVIGATING TO SUBMIT ARTICLE
 
-  // NAVIGATING TO ALL & FAVORITES
-  $body.on("click", "#nav-favorites, #nav-all, #profile-favorites", e => {
+  // NAVIGATING TO FAVORITES
+  $body.on("click", "#nav-favorites, #profile-favorites", e => {
     $submitForm.hide();
     $filteredArticles.hide();
     $loginForm.hide();
     $createAccountForm.hide();
     $myArticles.hide();
-    if ($(e.target).attr("id") === "nav-favorites" || $(e.target).attr("id") === "profile-favorites") {
-      if (!token) {
-        mustLogin($loginForm, $createAccountForm, $submitForm, $allArticlesList, $filteredArticles, $favoritedArticles);
-      } else {
-        $userProfile.hide();
-        $allArticlesList.hide();
-        generateFaves($favoritedArticles, userObject);
-        $favoritedArticles.show();
-      }
+    if (!token) {
+      mustLogin($loginForm, $createAccountForm, $submitForm, $allArticlesList, $filteredArticles, $favoritedArticles);
     } else {
-      $favoritedArticles.hide();
       $userProfile.hide();
-      $allArticlesList.show();
-      firstTenStories($allArticlesList);
+      $allArticlesList.hide();
+      generateFaves($favoritedArticles, userObject);
+      $favoritedArticles.show();
     }
   });
-  // END NAVIGATING TO ALL & FAVORITES
+  // END NAVIGATING TO FAVORITES
+
+  // NAVIGATING TO ALL
+  $body.on("click", "#nav-all", e => {
+    $submitForm.hide();
+    $filteredArticles.hide();
+    $loginForm.hide();
+    $createAccountForm.hide();
+    $myArticles.hide();
+    $favoritedArticles.hide();
+    $userProfile.hide();
+    $allArticlesList.show();
+    firstTenStories($allArticlesList);
+  });
+  // END NAVIGATING TO ALL
 
   // NAVIGATING TO MY STORIES
   $body.on("click", "#profile-my-stories, #nav-my-stories", e => {

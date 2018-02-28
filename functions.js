@@ -65,6 +65,7 @@ function generateFaves($favoritedArticles) {
 
 function generateMyStories($myArticles) {
   let storiesArr = userObject.data.stories;
+  let message = "<h5>No stories added by user yet!</h5>"
   $myArticles.empty();
   storiesArr.forEach(function (storyObj) {
     let url = storyObj.url;
@@ -84,6 +85,9 @@ function generateMyStories($myArticles) {
           </li>`);
     $myArticles.append($li);
   });
+  if ($myArticles.is(':empty')) {
+    $myArticles.append(message);
+  }
   $myArticles.show();
 }
 

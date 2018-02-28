@@ -144,6 +144,16 @@ form>hr {
   cursor: pointer;
 }
 
+.trash-can {
+  font-size: .75rem;
+  margin: 0 2px;
+  cursor: pointer;
+}
+
+.trash-can:hover {
+  color: crimson;
+}
+
 .article-link>strong {
   color: black;
   font-size: .85rem;
