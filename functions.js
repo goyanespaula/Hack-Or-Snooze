@@ -18,13 +18,14 @@ function getStories() {
 }
 
 function firstTenStories($allArticlesList) {
-  getStories().then(function (stories) {
-    stories.data.forEach(function (storyObject) {
+  getStories().then(function(stories) {
+    $allArticlesList.empty();
+    stories.data.forEach(function(storyObject) {
       let url = storyObject.url;
       let hostName = getHostName(url);
       let starType = isFavorite(storyObject) ? "fas" : "far";
       let favoriteClass = isFavorite(storyObject) ? "favorite" : "";
-      var $li = $(`<li id="${storyObject.storyId}" class="${favoriteClass}">
+      var $li = $(`<li id="${storyObject.storyId}" class="${favoriteClass} id-${storyObject.storyId}">
           <span class="star">
           <i class="${starType} fa-star"></i>
           </span>
@@ -36,21 +37,27 @@ function firstTenStories($allArticlesList) {
           </li>`);
       $allArticlesList.append($li);
     });
+    $allArticlesList.show();
   });
 }
 
 function isFavorite(storyObject) {
-  var favStoryIds = userObject.data.favorites.map(obj => obj.storyId);
+  let favStoryIds;
+  if (userObject) {
+    favStoryIds = userObject.data.favorites.map(obj => obj.storyId);
+  } else {
+    favStoryIds = [];
+  }
   return favStoryIds.includes(storyObject.storyId);
 }
 
 function generateFaves($favoritedArticles) {
   $favoritedArticles.empty();
-  var favStoryIds = userObject.data.favorites.map(obj => obj.storyId);
-  favStoryIds.forEach(function(storyId) {
-    $(`#all-articles-list #${storyId}`).clone().appendTo($favoritedArticles)
-  });
   let favoritesMessage = "<h5>No favorites added!</h5>";
+  let favStoryIds = userObject.data.favorites.map(obj => obj.storyId);
+  favStoryIds.forEach(function(storyId) {
+    $(`#all-articles-list .id-${storyId}`).clone().appendTo($favoritedArticles)
+  });
   if ($favoritedArticles.is(":empty")) {
     $favoritedArticles.append(favoritesMessage);
   }
@@ -63,11 +70,11 @@ function removeFromAPIFavorites(username, storyId) {
     headers: {
       Authorization: `Bearer ${localStorage.getItem("token")}`
     }
-  })
+  });
 }
 
 function removeFromFavorites(storyId, $favoritedArticles) {
-  let $unfavoritedList = $(`#${storyId}`);
+  let $unfavoritedList = $(`.id-${storyId}`);
   for (let i = 0; i < $unfavoritedList.length; i++) {
     let $closestSpan = $unfavoritedList.eq(i).find(".star");
     $closestSpan.html('<i class="far fa-star"></i>');
@@ -87,7 +94,7 @@ function addToAPIFavorites(username, storyId) {
 }
 
 function addToFavorites(storyId) {
-  let $unfavoritedList = $(`#${storyId}`);
+  let $unfavoritedList = $(`.id-${storyId}`);
   for (let i = 0; i < $unfavoritedList.length; i++) {
     let $closestSpan = $unfavoritedList.eq(i).find(".star");
     $closestSpan.html('<i class="fas fa-star"></i>');
@@ -146,6 +153,9 @@ function getToken(username, password) {
   }).then(function (val) {
     localStorage.setItem("token", val.data.token);
     token = localStorage.getItem("token");
+    payload = token.split(".")[1] || undefined;
+    parsedPayload = JSON.parse(atob(payload));
+    globalUsername = parsedPayload.username;
   });
 }
 
@@ -158,7 +168,7 @@ function addStory(title, url, author) {
     },
     data: {
       data: {
-        username,
+        username: globalUsername,
         title,
         author,
         url
@@ -173,7 +183,7 @@ function mustLogin(
   $submitForm,
   $allArticlesList,
   $filteredArticles,
-  $favoritedArticles
+  $favoritedArticles,
 ) {
   $loginForm.slideDown();
   $createAccountForm.slideDown();
@@ -181,5 +191,5 @@ function mustLogin(
   $allArticlesList.hide();
   $filteredArticles.hide();
   $favoritedArticles.hide();
-  alert("You must login before performing this action");
+  alert("You must login to perform this action");
 }

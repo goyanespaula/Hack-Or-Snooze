@@ -1,7 +1,7 @@
 var token = localStorage.getItem("token");
 var payload;
 var parsedPayload;
-var username;
+var globalUsername;
 var userObject;
 
 $(function () {
@@ -11,14 +11,13 @@ $(function () {
   var $articlesContainer = $(".articles-container");
   var $submitForm = $("#submit-form");
   var $allArticlesList = $("#all-articles-list");
-  var $nav = $("nav");
   var $navLogin = $("#nav-login");
   var $navWelcome = $("#nav-welcome");
   var $navUserProfile = $('#nav-user-profile');
   var $navLogOut = $("#nav-logout");
   var $navSubmit = $("#nav-submit");
-  var $navFavorites = $("#nav-favorites");
   var $navAll = $("#nav-all");
+  var $navMyFavorites = $("#nav-my-favorites");
   var $favoritedArticles = $("#favorited-articles");
   var $filteredArticles = $("#filtered-articles");
   var $userProfile = $("#user-profile");
@@ -29,52 +28,44 @@ $(function () {
   if (token) {
     payload = token.split(".")[1] || undefined;
     parsedPayload = JSON.parse(atob(payload));
-    username = parsedPayload.username;
-    getUser(username).then(function(user) {
+    globalUsername = parsedPayload.username;
+    getUser(globalUsername).then(function(user) {
       userObject = user;
       $profileName.text(`Name: ${userObject.data.name}`);
       $profileUsername.text(`Username: ${userObject.data.username}`);
       $profileAccountDate.text(`Account Created: ${userObject.data.createdAt.slice(0, 10)}`);
+      $navLogin.hide();
+      $navUserProfile.text(globalUsername);
+      $navWelcome.show();
+      $navLogOut.show();
       firstTenStories($allArticlesList);
     });
-  }
-
-  if (username) {
-    $navLogin.hide();
-    $navUserProfile.html(username);
-    $navWelcome.show();
-    $navLogOut.show();
+  } else {
+    firstTenStories($allArticlesList);
   }
 
   /* SUBMITTING EVENTS */
-  $navUserProfile.on("click", e=> {
-    $allArticlesList.hide();
-    $submitForm.hide();
-    $favoritedArticles.hide();
-    $filteredArticles.hide();
-    $userProfile.show();
-  });
-
   // LOGIN EVENT
   $loginForm.on("submit", e => {
     e.preventDefault();
-    var username = $("#login-username").val();
-    var password = $("#login-password").val();
+    let username = $("#login-username").val();
+    let password = $("#login-password").val();
     getToken(username, password)
-      .then(function () {
-        return getUser(username);
+      .then(function() {
+        return getUser(globalUsername);
       })
-      .then(function (user) {
+      .then(function(user) {
         userObject = user;
-        $navUserProfile.html(`${userObject.data.username}`);
+        $navUserProfile.text(`${userObject.data.username}`);
         $navLogin.hide();
         $loginForm.hide();
         $createAccountForm.hide();
         $navWelcome.show();
         $navLogOut.show();
         $allArticlesList.show();
+        firstTenStories($allArticlesList);
       })
-      .catch(function (error) {
+      .catch(function(error) {
         alert("USERNAME OR PASSWORD INVALID");
       });
 
@@ -85,9 +76,9 @@ $(function () {
   // CREATING USER EVENT
   $createAccountForm.on("submit", e => {
     e.preventDefault();
-    var name = $("#create-account-name").val();
-    var username = $("#create-account-username").val();
-    var password = $("#create-account-password").val();
+    let name = $("#create-account-name").val();
+    let username = $("#create-account-username").val();
+    let password = $("#create-account-password").val();
     createUser(name, username, password)
       .then(function () {
         getToken(username, password)
@@ -96,7 +87,7 @@ $(function () {
           })
           .then(function (user) {
             userObject = user;
-            $navWelcome.html(`Hi, ${userObject.data.username}`);
+            $navWelcome.html(`${userObject.data.username}`);
             $navLogin.hide();
             $loginForm.hide();
             $createAccountForm.hide();
@@ -105,8 +96,8 @@ $(function () {
             $allArticlesList.show();
           });
       })
-      .catch(function (error) {
-        alert("Woops, this user already exists.  Login instead.");
+      .catch(function(error) {
+        alert("Woops, this user already exists. Login instead.");
       });
 
     $createAccountForm.trigger("reset");
@@ -128,7 +119,7 @@ $(function () {
     let hostName = getHostName(url);
     let author = $("#author").val();
     addStory(title, url, author).then(function (storyObject) {
-      let $li = $(`<li id="${storyObject.storyId}">
+      let $li = $(`<li id="${storyObject.storyId}" class="id-${storyObject.storyId}">
       <span class="star">
       <i class="far fa-star"></i>
       </span>
@@ -139,7 +130,7 @@ $(function () {
       <small class="article-author">by ${author}</small>
       </li>`);
       $allArticlesList.prepend($li);
-      getUser(username).then(function (user) {
+      getUser(globalUsername).then(function(user) {
         userObject = user;
       });
     });
@@ -159,20 +150,20 @@ $(function () {
         $submitForm,
         $allArticlesList,
         $filteredArticles,
-        $favoritedArticles
+        $favoritedArticles,
       )
     } else {
       let $closestLi = $(e.target).closest("li");
       let storyId = $closestLi.attr("id");
       if ($closestLi.hasClass("favorite")) {
-        removeFromFavorites(storyId, $favoritedArticles);
-        removeFromAPIFavorites(username, storyId).then(function (user) {
+        removeFromAPIFavorites(globalUsername, storyId).then(function(user) {
           userObject = user;
-        })
+          removeFromFavorites(storyId, $favoritedArticles);
+        });
       } else {
-        addToFavorites(storyId, $favoritedArticles);
-        addToAPIFavorites(username, storyId).then(function (user) {
+        addToAPIFavorites(globalUsername, storyId).then(function (user) {
           userObject = user;
+          addToFavorites(storyId, $favoritedArticles);
         })
       }
     }
@@ -185,8 +176,6 @@ $(function () {
     $submitForm.hide();
     $allArticlesList.hide();
     $favoritedArticles.hide();
-    $navFavorites.hide();
-    $navAll.show();
     generateFiltered(selectedHost, $filteredArticles);
     $filteredArticles.show();
   });
@@ -206,6 +195,16 @@ $(function () {
   });
   // NAVIGATE TO LOGIN END
 
+  // NAVIGATE TO USER PROFILE
+  $navUserProfile.on("click", e => {
+    $allArticlesList.hide();
+    $favoritedArticles.hide();
+    $filteredArticles.hide();
+    $submitForm.hide();
+    $userProfile.show();
+  });
+  // END NAVIGATE TO USER PROFILE
+
   // NAVIGATING TO SUBMIT ARTICLE
   $navSubmit.on("click", e => {
     if (!token) {
@@ -215,7 +214,7 @@ $(function () {
         $submitForm,
         $allArticlesList,
         $filteredArticles,
-        $favoritedArticles
+        $favoritedArticles,
       );
     } else {
       $favoritedArticles.hide();
@@ -223,33 +222,33 @@ $(function () {
       $filteredArticles.hide();
       $loginForm.hide();
       $createAccountForm.hide();
-      if ($navAll.is(":visible")) {
-        $navAll.hide();
-        $navFavorites.show();
-      }
+      $userProfile.hide();
+
       $submitForm.slideToggle();
     }
   });
   // NAVIGATING TO SUBMIT ARTICLE
 
-  // SWITCHING BETWEEN ALL AND FAVORITES
+  // NAVIGATING TO ALL & FAVORITES
   $body.on("click", "#nav-favorites, #nav-all, #profile-favorites", e => {
     $submitForm.hide();
     $filteredArticles.hide();
     $loginForm.hide();
     $createAccountForm.hide();
-    if ($navFavorites.is(":visible")) {
-      $navFavorites.hide();
-      $navAll.show();
-      $allArticlesList.hide();
-      generateFaves($favoritedArticles, userObject);
-      $favoritedArticles.show();
+    if ($(e.target).attr("id") === "nav-favorites" || $(e.target).attr("id") === "profile-favorites") {
+      if (!token) {
+        mustLogin($loginForm, $createAccountForm, $submitForm, $allArticlesList, $filteredArticles, $favoritedArticles);
+      } else {
+        $userProfile.hide();
+        $allArticlesList.hide();
+        generateFaves($favoritedArticles, userObject);
+        $favoritedArticles.show();
+      }
     } else {
-      $navFavorites.show();
-      $navAll.hide();
       $favoritedArticles.hide();
+      $userProfile.hide();
       $allArticlesList.show();
     }
   });
-  // END SWITCHING BETWEEN ALL AND FAVORITES
+  // END NAVIGATING TO ALL & FAVORITES
 });

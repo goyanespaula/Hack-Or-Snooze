@@ -11,6 +11,11 @@ h1 {
   margin: 0;
 }
 
+h4 {
+  font-size: 1rem;
+  margin: 0;
+}
+
 h5 {
   font-size: .9rem;
   font-weight: lighter;
@@ -171,6 +176,15 @@ form>hr {
 
 #create-account-form button{
   margin-bottom: 25px;
+}
+
+#user-profile {
+  padding: 10px 20px 20px;
+  font-size: .9rem;
+}
+
+#user-profile>* {
+  margin: 10px 0;
 }
 
 .hidden {

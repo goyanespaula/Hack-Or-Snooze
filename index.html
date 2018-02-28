@@ -16,13 +16,16 @@
   <nav>
     <h1>Hack or Snooze</h1>
     <section class="main-nav-links">
-      <a class="nav-link" href="#" id="nav-submit">submit</a>
+      <a class="nav-link" href="#" id="nav-all">all</a>
       <span>|</span>
       <a class="nav-link" href="#" id="nav-favorites">favorites</a>
-      <a class="nav-link hidden" href="#" id="nav-all">all</a>
+      <span>|</span>
+      <a class="nav-link" href="#" id="nav-my-stories">my stories</a>
+      <span>|</span>
+      <a class="nav-link" href="#" id="nav-submit">submit</a>
     </section>
     <a class="nav-link nav-right" href="#" id="nav-login">login</a>
-    <span class="nav-link nav-right hidden" id="nav-welcome"><a href="#" id="nav-user-profile">Hi, </a></span>
+    <span class="nav-link nav-right hidden" id="nav-welcome"><a href="#" id="nav-user-profile"></a></span>
     <a class="hidden" id="nav-logout" href="#">
       <small>(logout)</small>
     </a>
@@ -89,10 +92,14 @@
     </form>
   </section>
   <section id="user-profile" class="container hidden">
-    <div id="profile-name">Name: </div>
-    <div id="profile-username">Username: </div>
-    <div id="profile-account-date">Account Created: </div>
-    <div><a href="#" id="profile-favorites">favorites</a></div>
+    <h4>User Profile Info</h4>
+    <section>
+      <div id="profile-name">Name: </div>
+      <div id="profile-username">Username: </div>
+      <div id="profile-account-date">Account Created: </div>
+    </section>
+    <a href="#" id="profile-favorites">favorites</a>
+    <span>|</span>
     <a href="#">my stories</a>
   </section>
 </body>
