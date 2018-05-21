@@ -1,8 +1,8 @@
 # AJAX with jQuery Exercise: Hack-or-Snooze
 
-### In this exercise, we've worked our Hacker News clone to use AJAX.
+In this exercise, we've worked our Hacker News clone to use AJAX.
 
-### This frontend was built using Rithm's very own [Hack-or-Snooze API](https://hackorsnoozeapi.docs.apiary.io/#).
+This frontend was built using Rithm's very own [Hack-or-Snooze API](https://hackorsnoozeapi.docs.apiary.io/#).
 
 ## Requirements
 
