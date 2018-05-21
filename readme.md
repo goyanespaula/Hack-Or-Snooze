@@ -6,6 +6,8 @@ A Hacker News clone using AJAX coded by [Paula Goyanes](https://github.com/goyan
 
 This frontend was built using Rithm's very own [Hack-or-Snooze API](https://hackorsnoozeapi.docs.apiary.io/#).
 
+To run, simply open index.html!
+
 ## Requirements
 
 The requirements below are listed as Agile/Scrum requirements that you might see on a software engineering kanban board or task list. The tasks are phrased as "User Stories", which means they are written from the perspective of a user/customer.
