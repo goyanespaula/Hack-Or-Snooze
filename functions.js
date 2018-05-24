@@ -56,12 +56,6 @@ function isFavorite(storyObject) {
 function removeFromAPIFavorites(username, storyId) {
   return $.ajax({
     method: "DELETE",
-    crossDomain: true,
-    xhrFields: {
-      withCredentials: true
-    },
-    jsonp: "callback",
-    dataType: "jsonp",
     url: `https://hack-or-snooze.herokuapp.com/users/${username}/favorites/${storyId}`,
     headers: {
       Authorization: `Bearer ${localStorage.getItem("token")}`
@@ -80,18 +74,17 @@ function removeFromDOMFavorites(storyId, $favoritedArticles) {
 }
 
 function addToAPIFavorites(username, storyId) {
+  console.log(storyId);
   return $.ajax({
     method: "POST",
-    crossDomain: true,
-    xhrFields: {
-      withCredentials: true
-    },
-    jsonp: "callback",
+    // crossDomain: true,
+    // xhrFields: {
+    //   withCredentials: true
+    // },
+    // jsonp: "callback",
     dataType: "jsonp",
     url: `https://hack-or-snooze.herokuapp.com/users/${username}/favorites/${storyId}`,
-    headers: {
-      Authorization: `Bearer ${localStorage.getItem("token")}`
-    }
+    headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }
   });
 }
 
@@ -107,12 +100,31 @@ function addToDOMFavorites(storyId) {
 function generateFaves($favoritedArticles) {
   $favoritedArticles.empty();
   let favoritesMessage = "<h5>No favorites added!</h5>";
-  let favStoryIds = userObject.data.favorites.map(obj => obj.storyId);
-  favStoryIds.forEach(function(storyId) {
-    $(`#all-articles-list .id-${storyId}`)
-      .clone()
-      .appendTo($favoritedArticles);
+  userObject.data.favorites.forEach(storyObject => {
+    let url = storyObject.url;
+    let hostName = getHostName(url);
+    let starType = "fas";
+    let favoriteClass = "favorite";
+    var $li = $(`<li id="${storyObject.storyId}" class="${favoriteClass} id-${
+      storyObject.storyId
+    }">
+          <span class="star">
+          <i class="${starType} fa-star"></i>
+          </span>
+          <a class="article-link" href="${storyObject.url}" target="a_blank">
+            <strong>${storyObject.title}</strong>
+           </a>
+          <small class="article-hostname ${hostName}">(${hostName})</small>
+          <small class="article-author">by ${storyObject.author}</small>
+          </li>`);
+    $favoritedArticles.append($li);
   });
+  // let favStoryIds = userObject.data.favorites.map(obj => obj.storyId);
+  // favStoryIds.forEach(function(storyId) {
+  //   $(`#all-articles-list .id-${storyId}`)
+  //     .clone()
+  //     .appendTo($favoritedArticles);
+  // });
   if ($favoritedArticles.is(":empty")) {
     $favoritedArticles.append(favoritesMessage);
   }
@@ -169,12 +181,6 @@ function generateFiltered(selectedHost, $filteredArticles) {
 function createUser(name, username, password) {
   return $.ajax({
     method: "POST",
-    crossDomain: true,
-    xhrFields: {
-      withCredentials: true
-    },
-    jsonp: "callback",
-    dataType: "jsonp",
     url: "https://hack-or-snooze.herokuapp.com/users",
     data: {
       data: {
@@ -189,12 +195,6 @@ function createUser(name, username, password) {
 function getUser(username) {
   return $.ajax({
     method: "GET",
-    crossDomain: true,
-    xhrFields: {
-      withCredentials: true
-    },
-    jsonp: "callback",
-    dataType: "jsonp",
     url: `https://hack-or-snooze.herokuapp.com/users/${username}`,
     headers: {
       Authorization: `Bearer ${localStorage.getItem("token")}`
@@ -202,15 +202,9 @@ function getUser(username) {
   });
 }
 
-function getToken(username, password, token) {
+function getToken(username, password) {
   return $.ajax({
     method: "POST",
-    crossDomain: true,
-    xhrFields: {
-      withCredentials: true
-    },
-    jsonp: "callback",
-    dataType: "jsonp",
     url: "https://hack-or-snooze.herokuapp.com/auth",
     data: {
       data: {
@@ -230,12 +224,6 @@ function getToken(username, password, token) {
 function addStory(title, url, author) {
   return $.ajax({
     method: "POST",
-    crossDomain: true,
-    xhrFields: {
-      withCredentials: true
-    },
-    jsonp: "callback",
-    dataType: "jsonp",
     url: "https://hack-or-snooze.herokuapp.com/stories",
     headers: {
       Authorization: `Bearer ${localStorage.getItem("token")}`
@@ -254,12 +242,6 @@ function addStory(title, url, author) {
 function deleteStory(storyId) {
   return $.ajax({
     method: "DELETE",
-    crossDomain: true,
-    xhrFields: {
-      withCredentials: true
-    },
-    jsonp: "callback",
-    dataType: "jsonp",
     url: `https://hack-or-snooze.herokuapp.com/stories/${storyId}`,
     headers: {
       Authorization: `Bearer ${localStorage.getItem("token")}`
