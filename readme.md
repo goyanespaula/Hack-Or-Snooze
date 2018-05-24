@@ -8,9 +8,9 @@ This frontend was built using Rithm's very own [Hack-or-Snooze API](https://hack
 
 To run, simply open index.html!
 
-## Requirements
+## Features
 
-The requirements below are listed as Agile/Scrum requirements that you might see on a software engineering kanban board or task list. The tasks are phrased as "User Stories", which means they are written from the perspective of a user/customer.
+The features below are listed as Agile/Scrum requirements that you might see on a software engineering kanban board or task list. The tasks are phrased as "User Stories", which means they are written from the perspective of a user/customer.
 
 1.  As a user, I can see at least 10 latest stories on the homepage which link to the actual stories.
 1.  As a user, I can login or signup for an account on the homepage.
@@ -21,13 +21,6 @@ The requirements below are listed as Agile/Scrum requirements that you might see
 1.  As a logged in user, I can view stories that I posted and my favorites in my profile.
 1.  As a logged in user, I can remove individual stories that I've created from the list in my profile.
 1.  As a logged in user, I can remove individual favorites from the list of favorites in my profile.
-
-### BONUS
-
-* As a user, I can edit stories that I've created
-* As a user, I can change my `name` and `password` in my profile.
-* As a user, I want infinite scroll! When I scroll to the bottom of the page, it loads more stories.
-* Come up with some other features you can build using what our Hack or Snooze API makes availalbe to you!
 
 ### To get started with the API, check out the [Quickstart section](https://hackorsnoozeapi.docs.apiary.io/#introduction/quickstart) of the documentation.
 

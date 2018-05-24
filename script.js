@@ -4,7 +4,7 @@ var parsedPayload;
 var globalUsername;
 var userObject;
 
-$(function () {
+$(function() {
   var $body = $("body");
   var $articlesContainer = $(".articles-container");
   var $allArticlesList = $("#all-articles-list");
@@ -16,24 +16,34 @@ $(function () {
   var $myArticles = $("#my-articles");
   var $navLogin = $("#nav-login");
   var $navWelcome = $("#nav-welcome");
-  var $navUserProfile = $('#nav-user-profile');
+  var $navUserProfile = $("#nav-user-profile");
   var $navLogOut = $("#nav-logout");
   var $navSubmit = $("#nav-submit");
   var $userProfile = $("#user-profile");
   var $profileName = $("#profile-name");
   var $profileUsername = $("#profile-username");
   var $profileAccountDate = $("#profile-account-date");
-  var elementsForHiding = [$allArticlesList, $submitForm, $favoritedArticles, $filteredArticles, $loginForm, $createAccountForm, $userProfile];
+  var elementsForHiding = [
+    $allArticlesList,
+    $submitForm,
+    $favoritedArticles,
+    $filteredArticles,
+    $loginForm,
+    $createAccountForm,
+    $userProfile
+  ];
 
   if (token) {
     payload = token.split(".")[1] || undefined;
     parsedPayload = JSON.parse(atob(payload));
     globalUsername = parsedPayload.username;
-    getUser(globalUsername).then(function (user) {
+    getUser(globalUsername).then(function(user) {
       userObject = user;
       $profileName.text(`Name: ${userObject.data.name}`);
       $profileUsername.text(`Username: ${userObject.data.username}`);
-      $profileAccountDate.text(`Account Created: ${userObject.data.createdAt.slice(0, 10)}`);
+      $profileAccountDate.text(
+        `Account Created: ${userObject.data.createdAt.slice(0, 10)}`
+      );
       $navLogin.hide();
       $navUserProfile.text(globalUsername);
       $navWelcome.show();
@@ -50,11 +60,11 @@ $(function () {
     e.preventDefault();
     let username = $("#login-username").val();
     let password = $("#login-password").val();
-    getToken(username, password)
-      .then(function () {
+    getToken(username, password, token)
+      .then(function() {
         return getUser(globalUsername);
       })
-      .then(function (user) {
+      .then(function(user) {
         userObject = user;
         $navUserProfile.text(`${userObject.data.username}`);
         $navLogin.hide();
@@ -65,7 +75,7 @@ $(function () {
         $allArticlesList.show();
         generateTenStories($allArticlesList);
       })
-      .catch(function (error) {
+      .catch(function(error) {
         alert("USERNAME OR PASSWORD INVALID");
       });
 
@@ -80,12 +90,12 @@ $(function () {
     let username = $("#create-account-username").val();
     let password = $("#create-account-password").val();
     createUser(name, username, password)
-      .then(function () {
-        getToken(username, password)
-          .then(function () {
+      .then(function() {
+        getToken(username, password, token)
+          .then(function() {
             return getUser(username);
           })
-          .then(function (user) {
+          .then(function(user) {
             userObject = user;
             $navUserProfile.text(`${userObject.data.username}`);
             $navLogin.hide();
@@ -105,7 +115,7 @@ $(function () {
   // END CREATING USER EVENT
 
   // CREATE LOGOUT EVENT
-  $navLogOut.on("click", function (e) {
+  $navLogOut.on("click", function(e) {
     localStorage.clear();
     location.reload();
   });
@@ -118,8 +128,10 @@ $(function () {
     let url = $("#url").val();
     let hostName = getHostName(url);
     let author = $("#author").val();
-    addStory(title, url, author).then(function (storyObject) {
-      let $li = $(`<li id="${storyObject.storyId}" class="id-${storyObject.storyId}">
+    addStory(title, url, author).then(function(storyObject) {
+      let $li = $(`<li id="${storyObject.storyId}" class="id-${
+        storyObject.storyId
+      }">
       <span class="star">
       <i class="far fa-star"></i>
       </span>
@@ -130,7 +142,7 @@ $(function () {
       <small class="article-author">by ${author}</small>
       </li>`);
       $allArticlesList.prepend($li);
-      getUser(globalUsername).then(function (user) {
+      getUser(globalUsername).then(function(user) {
         userObject = user;
       });
     });
@@ -150,21 +162,21 @@ $(function () {
         $submitForm,
         $allArticlesList,
         $filteredArticles,
-        $favoritedArticles,
-      )
+        $favoritedArticles
+      );
     } else {
       let $closestLi = $(e.target).closest("li");
       let storyId = $closestLi.attr("id");
       if ($closestLi.hasClass("favorite")) {
-        removeFromAPIFavorites(globalUsername, storyId).then(function (user) {
+        removeFromAPIFavorites(globalUsername, storyId).then(function(user) {
           userObject = user;
           removeFromDOMFavorites(storyId, $favoritedArticles);
         });
       } else {
-        addToAPIFavorites(globalUsername, storyId).then(function (user) {
+        addToAPIFavorites(globalUsername, storyId).then(function(user) {
           userObject = user;
           addToDOMFavorites(storyId, $favoritedArticles);
-        })
+        });
       }
     }
   });
@@ -175,10 +187,10 @@ $(function () {
     let $closestLi = $(e.target).closest("li");
     let storyId = $closestLi.attr("id");
     deleteStory(storyId).then(function() {
-      getUser(globalUsername).then(function (user) {
+      getUser(globalUsername).then(function(user) {
         userObject = user;
         generateMyStories($myArticles);
-      })
+      });
     });
   });
   // END DELETING A STORY
@@ -230,7 +242,7 @@ $(function () {
         $submitForm,
         $allArticlesList,
         $filteredArticles,
-        $favoritedArticles,
+        $favoritedArticles
       );
     } else {
       $favoritedArticles.hide();
@@ -254,7 +266,14 @@ $(function () {
     $myArticles.hide();
     $userProfile.hide();
     if (!token) {
-      mustLogin($loginForm, $createAccountForm, $submitForm, $allArticlesList, $filteredArticles, $favoritedArticles);
+      mustLogin(
+        $loginForm,
+        $createAccountForm,
+        $submitForm,
+        $allArticlesList,
+        $filteredArticles,
+        $favoritedArticles
+      );
     } else {
       generateFaves($favoritedArticles, userObject);
       $favoritedArticles.show();
@@ -285,7 +304,14 @@ $(function () {
     $createAccountForm.hide();
     $allArticlesList.hide();
     if (!token) {
-      mustLogin($loginForm, $createAccountForm, $submitForm, $allArticlesList, $filteredArticles, $favoritedArticles);
+      mustLogin(
+        $loginForm,
+        $createAccountForm,
+        $submitForm,
+        $allArticlesList,
+        $filteredArticles,
+        $favoritedArticles
+      );
     } else {
       $userProfile.hide();
       generateMyStories($myArticles);

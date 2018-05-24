@@ -18,14 +18,16 @@ function getStories() {
 }
 
 function generateTenStories($allArticlesList) {
-  getStories().then(function (stories) {
+  getStories().thesn(function(stories) {
     $allArticlesList.empty();
-    stories.data.forEach(function (storyObject) {
+    stories.data.forEach(function(storyObject) {
       let url = storyObject.url;
       let hostName = getHostName(url);
       let starType = isFavorite(storyObject) ? "fas" : "far";
       let favoriteClass = isFavorite(storyObject) ? "favorite" : "";
-      var $li = $(`<li id="${storyObject.storyId}" class="${favoriteClass} id-${storyObject.storyId}">
+      var $li = $(`<li id="${storyObject.storyId}" class="${favoriteClass} id-${
+        storyObject.storyId
+      }">
           <span class="star">
           <i class="${starType} fa-star"></i>
           </span>
@@ -54,6 +56,12 @@ function isFavorite(storyObject) {
 function removeFromAPIFavorites(username, storyId) {
   return $.ajax({
     method: "DELETE",
+    crossDomain: true,
+    xhrFields: {
+      withCredentials: true
+    },
+    jsonp: "callback",
+    dataType: "jsonp",
     url: `https://hack-or-snooze.herokuapp.com/users/${username}/favorites/${storyId}`,
     headers: {
       Authorization: `Bearer ${localStorage.getItem("token")}`
@@ -74,11 +82,17 @@ function removeFromDOMFavorites(storyId, $favoritedArticles) {
 function addToAPIFavorites(username, storyId) {
   return $.ajax({
     method: "POST",
+    crossDomain: true,
+    xhrFields: {
+      withCredentials: true
+    },
+    jsonp: "callback",
+    dataType: "jsonp",
     url: `https://hack-or-snooze.herokuapp.com/users/${username}/favorites/${storyId}`,
     headers: {
       Authorization: `Bearer ${localStorage.getItem("token")}`
     }
-  })
+  });
 }
 
 function addToDOMFavorites(storyId) {
@@ -155,6 +169,12 @@ function generateFiltered(selectedHost, $filteredArticles) {
 function createUser(name, username, password) {
   return $.ajax({
     method: "POST",
+    crossDomain: true,
+    xhrFields: {
+      withCredentials: true
+    },
+    jsonp: "callback",
+    dataType: "jsonp",
     url: "https://hack-or-snooze.herokuapp.com/users",
     data: {
       data: {
@@ -169,6 +189,12 @@ function createUser(name, username, password) {
 function getUser(username) {
   return $.ajax({
     method: "GET",
+    crossDomain: true,
+    xhrFields: {
+      withCredentials: true
+    },
+    jsonp: "callback",
+    dataType: "jsonp",
     url: `https://hack-or-snooze.herokuapp.com/users/${username}`,
     headers: {
       Authorization: `Bearer ${localStorage.getItem("token")}`
@@ -176,9 +202,15 @@ function getUser(username) {
   });
 }
 
-function getToken(username, password) {
+function getToken(username, password, token) {
   return $.ajax({
     method: "POST",
+    crossDomain: true,
+    xhrFields: {
+      withCredentials: true
+    },
+    jsonp: "callback",
+    dataType: "jsonp",
     url: "https://hack-or-snooze.herokuapp.com/auth",
     data: {
       data: {
@@ -186,7 +218,7 @@ function getToken(username, password) {
         password: password
       }
     }
-  }).then(function (val) {
+  }).then(function(val) {
     localStorage.setItem("token", val.data.token);
     token = localStorage.getItem("token");
     payload = token.split(".")[1] || undefined;
@@ -198,6 +230,12 @@ function getToken(username, password) {
 function addStory(title, url, author) {
   return $.ajax({
     method: "POST",
+    crossDomain: true,
+    xhrFields: {
+      withCredentials: true
+    },
+    jsonp: "callback",
+    dataType: "jsonp",
     url: "https://hack-or-snooze.herokuapp.com/stories",
     headers: {
       Authorization: `Bearer ${localStorage.getItem("token")}`
@@ -216,6 +254,12 @@ function addStory(title, url, author) {
 function deleteStory(storyId) {
   return $.ajax({
     method: "DELETE",
+    crossDomain: true,
+    xhrFields: {
+      withCredentials: true
+    },
+    jsonp: "callback",
+    dataType: "jsonp",
     url: `https://hack-or-snooze.herokuapp.com/stories/${storyId}`,
     headers: {
       Authorization: `Bearer ${localStorage.getItem("token")}`
@@ -229,7 +273,7 @@ function mustLogin(
   $submitForm,
   $allArticlesList,
   $filteredArticles,
-  $favoritedArticles,
+  $favoritedArticles
 ) {
   $loginForm.slideDown();
   $createAccountForm.slideDown();
