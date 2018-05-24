@@ -74,15 +74,8 @@ function removeFromDOMFavorites(storyId, $favoritedArticles) {
 }
 
 function addToAPIFavorites(username, storyId) {
-  console.log(storyId);
   return $.ajax({
     method: "POST",
-    // crossDomain: true,
-    // xhrFields: {
-    //   withCredentials: true
-    // },
-    // jsonp: "callback",
-    dataType: "jsonp",
     url: `https://hack-or-snooze.herokuapp.com/users/${username}/favorites/${storyId}`,
     headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }
   });
