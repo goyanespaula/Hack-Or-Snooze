@@ -18,7 +18,7 @@ function getStories() {
 }
 
 function generateTenStories($allArticlesList) {
-  getStories().thesn(function(stories) {
+  getStories().then(function(stories) {
     $allArticlesList.empty();
     stories.data.forEach(function(storyObject) {
       let url = storyObject.url;
